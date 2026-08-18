@@ -155,11 +155,15 @@
   }
   
   .desktop-cta {
-    display: block;
+    display: flex;
   }
   
   .mobile-cta {
     display: none;
+  }
+  
+  .mobile-only-links {
+    display: none !important;
   }
   
   .nav-overlay {
