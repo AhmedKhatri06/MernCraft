@@ -1,5 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
+import authRoutes from './authRoutes.js';
+import adminRoutes from './adminRoutes.js';
 import { submitContact } from '../controllers/contactController.js';
 
 const router = express.Router();
@@ -17,5 +19,11 @@ router.get('/health', (req, res) => {
 
 // Contact Route
 router.post('/contact', submitContact);
+
+// Auth Routes
+router.use('/auth', authRoutes);
+
+// Admin Routes
+router.use('/admin', adminRoutes);
 
 export default router;
