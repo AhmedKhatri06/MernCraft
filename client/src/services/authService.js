@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5000/api/auth';
+const API_URL = 'https://merncraft.onrender.com.';
 
 const login = async (email, password) => {
   const response = await fetch(`${API_URL}/login`, {
@@ -25,7 +25,7 @@ const register = async (name, email, password) => {
 };
 
 const logout = async () => {
-  const response = await fetch(`${API_URL}/logout`, { 
+  const response = await fetch(`${API_URL}/logout`, {
     method: 'POST',
     credentials: 'include'
   });

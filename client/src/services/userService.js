@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5000/api/admin/users';
+const API_URL = 'https://merncraft.onrender.com/api/admin/users';
 
 const getUsers = async (page = 1, limit = 10, search = '', role = '') => {
   let url = `${API_URL}?page=${page}&limit=${limit}`;
