@@ -1,0 +1,53 @@
+.service-card {
+  background-color: var(--mc-white);
+  padding: 32px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.service-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--mc-green);
+}
+
+.service-icon {
+  width: 60px;
+  height: 60px;
+  background-color: rgba(46, 125, 50, 0.1);
+  color: var(--mc-green);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.service-title {
+  font-size: 1.25rem;
+  margin-bottom: 12px;
+}
+
+.service-desc {
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  flex-grow: 1;
+}
+
+.service-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--mc-navy);
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.service-card:hover .service-link {
+  color: var(--mc-green);
+}

@@ -1,0 +1,105 @@
+.pricing-selector-mobile {
+  display: flex;
+  overflow-x: auto;
+  gap: 12px;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+}
+
+.pricing-selector-mobile::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+.pricing-tab {
+  background-color: var(--mc-white);
+  border: 1px solid var(--border-color);
+  padding: 10px 20px;
+  border-radius: 100px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  transition: var(--transition);
+}
+
+.pricing-tab.active {
+  background-color: var(--mc-navy);
+  color: var(--mc-white);
+  border-color: var(--mc-navy);
+}
+
+.pricing-card-wrapper {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+@media (max-width: 1199px) {
+  /* On mobile and tablet, only show the active card */
+  .pricing-grid {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .pricing-card-wrapper.inactive {
+    display: none;
+  }
+  
+  .pricing-card-wrapper.active {
+    display: block;
+    width: 100%;
+    max-width: 450px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .pricing-selector-mobile {
+    display: none;
+  }
+  
+  .pricing-card-wrapper:hover {
+    transform: translateY(-8px);
+  }
+}
+
+.pricing-disclaimer {
+  text-align: center;
+  margin-top: 40px;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.faq-section {
+  background-color: var(--mc-white);
+}
+
+.faq-container {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.faq-item {
+  background-color: var(--bg-tertiary);
+  padding: 30px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+}
+
+.faq-item h4 {
+  font-size: 1.25rem;
+  color: var(--mc-navy-dark);
+  margin-bottom: 12px;
+}
+
+.faq-item p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}

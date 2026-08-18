@@ -1,0 +1,40 @@
+.cta-section {
+  background: linear-gradient(135deg, var(--mc-navy) 0%, var(--mc-navy-dark) 100%);
+  padding: 20px 0;
+  color: var(--mc-white);
+  margin-bottom: 20px;
+}
+
+.cta-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 32px;
+}
+
+@media (min-width: 992px) {
+  .cta-container {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+  }
+}
+
+.cta-content h2 {
+  color: var(--mc-white);
+  font-size: 2.5rem;
+  margin-bottom: 16px;
+}
+
+.cta-content p {
+  color: var(--text-muted);
+  font-size: 1.125rem;
+  max-width: 600px;
+}
+
+.cta-btn {
+  font-size: 1.125rem;
+  padding: 16px 32px;
+  white-space: nowrap;
+}
