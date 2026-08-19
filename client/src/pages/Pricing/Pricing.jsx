@@ -15,10 +15,10 @@ const Pricing = () => {
             <h2>Transparent Pricing</h2>
             <p>Professional solutions tailored to your scale and requirements. Final pricing depends on project scope, features, integrations and complexity.</p>
           </div>
-          
+
           <div className="pricing-selector-mobile">
             {pricing.map((tier) => (
-              <button 
+              <button
                 key={tier.tier}
                 className={`pricing-tab ${activePlan === tier.tier ? 'active' : ''}`}
                 onClick={() => setActivePlan(tier.tier)}
@@ -27,15 +27,15 @@ const Pricing = () => {
               </button>
             ))}
           </div>
-          
+
           <div className="pricing-grid">
             {pricing.map((tier, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className={`pricing-card-wrapper ${activePlan === tier.tier ? 'active' : 'inactive'}`}
                 onClick={() => setActivePlan(tier.tier)}
               >
-                <PricingCard 
+                <PricingCard
                   tier={tier.tier}
                   price={tier.price}
                   description={tier.description}
@@ -48,11 +48,14 @@ const Pricing = () => {
           </div>
 
           <div className="pricing-disclaimer">
-            <p>* The prices listed above are starting points. Every business is unique, and we provide custom quotes based on a detailed technical discovery phase.</p>
+            <p>
+              + According to the Requirements of the Client.
+              <br />
+              * The prices listed above are starting points. Every business is unique, and we provide custom quotes based on a detailed technical discovery phase.</p>
           </div>
         </div>
       </div>
-      
+
       <div className="faq-section section-padding">
         <div className="container">
           <div className="section-header">
