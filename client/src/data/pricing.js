@@ -14,7 +14,8 @@ export const pricing = [
   },
   {
     tier: 'BUSINESS',
-    price: '₹29,999',
+    price: '₹14,999+',
+    smallNote: '(Upto 30K according to the Requirements)',
     description: 'Advanced features and custom functionality for growing businesses and agencies.',
     features: [
       'Custom UI/UX Design',
@@ -27,7 +28,7 @@ export const pricing = [
   },
   {
     tier: 'E-COMMERCE',
-    price: '₹59,999',
+    price: '₹44,999+',
     description: 'Complete online store solution to sell your products globally.',
     features: [
       'Full Product Catalogue',
@@ -40,7 +41,7 @@ export const pricing = [
   },
   {
     tier: 'CUSTOM',
-    price: '₹99,999+',
+    price: '₹60,000+',
     description: 'Complex web applications and SaaS platforms tailored to your specific workflows.',
     features: [
       'Bespoke Web Application',
