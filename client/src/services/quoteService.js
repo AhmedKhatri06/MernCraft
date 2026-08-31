@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5000/api/admin/quotes';
+const API_URL = `${import.meta.env.VITE_API_URL}/admin/quotes`;
 
 const getQuotes = async () => {
   const response = await fetch(API_URL, { credentials: 'include' });

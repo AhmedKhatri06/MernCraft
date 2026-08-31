@@ -1,5 +1,5 @@
 export const createGenericService = (endpoint) => {
-  const API_URL = `http://localhost:5000/api/admin/${endpoint}`;
+  const API_URL = `${import.meta.env.VITE_API_URL}/admin/${endpoint}`;
 
   return {
     getAll: async () => {

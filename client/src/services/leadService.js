@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5000/api/admin/leads';
+const API_URL = `${import.meta.env.VITE_API_URL}/admin/leads`;
 
 const getLeads = async (page = 1, limit = 10, search = '', status = '') => {
   let url = `${API_URL}?page=${page}&limit=${limit}`;

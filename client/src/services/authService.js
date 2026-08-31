@@ -1,4 +1,4 @@
-const API_URL = 'https://merncraft.onrender.com.';
+const API_URL = `${import.meta.env.VITE_API_URL}/auth`;
 
 const login = async (email, password) => {
   const response = await fetch(`${API_URL}/login`, {

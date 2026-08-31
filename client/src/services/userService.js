@@ -1,4 +1,4 @@
-const API_URL = 'https://merncraft.onrender.com/api/admin/users';
+const API_URL = `${import.meta.env.VITE_API_URL}/admin/users`;
 
 const getUsers = async (page = 1, limit = 10, search = '', role = '') => {
   let url = `${API_URL}?page=${page}&limit=${limit}`;
