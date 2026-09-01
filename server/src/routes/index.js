@@ -26,4 +26,8 @@ router.use('/auth', authRoutes);
 // Admin Routes
 router.use('/admin', adminRoutes);
 
+// Public Routes
+import publicRoutes from './publicRoutes.js';
+router.use('/public', publicRoutes);
+
 export default router;

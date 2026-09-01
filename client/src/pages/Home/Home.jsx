@@ -1,17 +1,73 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Code, Monitor, Smartphone, Server } from 'lucide-react';
 import ServiceCard from '../../components/ServiceCard/ServiceCard';
 import ProjectCard from '../../components/ProjectCard/ProjectCard';
 import PricingCard from '../../components/PricingCard/PricingCard';
 import CTA from '../../components/CTA/CTA';
-import { services } from '../../data/services';
-import { projects } from '../../data/projects';
-import { pricing } from '../../data/pricing';
+import publicService from '../../services/publicService';
 import './Home.css';
 
 const Home = () => {
-  const [activePlan, setActivePlan] = useState(pricing.find(p => p.isPopular)?.tier || pricing[0].tier);
+  const [services, setServices] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [pricing, setPricing] = useState([]);
+  const [activePlan, setActivePlan] = useState('');
+  
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [servicesRes, projectsRes, pricingRes] = await Promise.all([
+          publicService.getPublicServices(),
+          publicService.getPublicProjects(),
+          publicService.getPublicPricing()
+        ]);
+
+        if (servicesRes.success) {
+          const activeServices = servicesRes.data
+            .filter(s => s.active !== false)
+            .map(s => ({
+              id: s._id,
+              title: s.name,
+              description: s.description,
+              icon: s.icon || 'Code',
+              link: `/contact?service=${s.slug || s._id}`
+            }));
+          setServices(activeServices);
+        }
+
+        if (projectsRes.success) {
+          const formattedProjects = projectsRes.data.map(p => ({
+            id: p._id,
+            title: p.name,
+            category: p.category,
+            description: p.description,
+            image: p.image || 'https://via.placeholder.com/800x600?text=Project',
+            technologies: p.technologies || [],
+            link: p.link || '#'
+          }));
+          setProjects(formattedProjects);
+        }
+
+        if (pricingRes.success) {
+          setPricing(pricingRes.data);
+          if (pricingRes.data.length > 0) {
+            setActivePlan(pricingRes.data.find(p => p.isPopular)?.tier || pricingRes.data[0].tier);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch home page data', err);
+        setError('Failed to load some content. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div className="home-page">
@@ -68,16 +124,23 @@ const Home = () => {
             <h2>Our Core Services</h2>
             <p>We provide end-to-end digital solutions designed to meet your specific business needs.</p>
           </div>
-          <div className="services-grid">
-            {services.slice(0, 4).map(service => (
-              <ServiceCard 
-                key={service.id}
-                title={service.title}
-                description={service.description}
-                icon={service.icon}
-              />
-            ))}
-          </div>
+          {loading ? (
+             <div className="loading-state" style={{ textAlign: 'center', padding: '2rem' }}>Loading services...</div>
+          ) : services.length > 0 ? (
+            <div className="services-grid">
+              {services.slice(0, 4).map(service => (
+                <ServiceCard 
+                  key={service.id}
+                  title={service.title}
+                  description={service.description}
+                  icon={service.icon}
+                  link={service.link}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="empty-state" style={{ textAlign: 'center', padding: '2rem' }}>Services content coming soon.</div>
+          )}
           <div className="section-footer">
             <Link to="/services" className="btn btn-secondary">
               View All Services <ArrowRight size={20} className="icon-right" />
@@ -121,15 +184,21 @@ const Home = () => {
             <h2>Featured Work</h2>
             <p>Take a look at some of the recent projects we've successfully delivered.</p>
           </div>
-          <div className="projects-editorial-list">
-            {projects.slice(0, 3).map((project, index) => (
-              <ProjectCard 
-                key={project.id} 
-                project={project} 
-                variant={`editorial ${index % 2 !== 0 ? 'reverse' : ''}`}
-              />
-            ))}
-          </div>
+          {loading ? (
+             <div className="loading-state" style={{ textAlign: 'center', padding: '2rem' }}>Loading projects...</div>
+          ) : projects.length > 0 ? (
+            <div className="projects-editorial-list">
+              {projects.slice(0, 3).map((project, index) => (
+                <ProjectCard 
+                  key={project.id} 
+                  project={project} 
+                  variant={`editorial ${index % 2 !== 0 ? 'reverse' : ''}`}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="empty-state" style={{ textAlign: 'center', padding: '2rem' }}>Portfolio content coming soon.</div>
+          )}
           <div className="section-footer">
             <Link to="/projects" className="btn btn-secondary">
               View All Projects <ArrowRight size={20} className="icon-right" />
@@ -212,35 +281,43 @@ const Home = () => {
             <h2>Transparent Pricing</h2>
             <p>Professional solutions tailored to your scale and requirements.</p>
           </div>
-          <div className="pricing-selector-mobile">
-            {pricing.map((tier) => (
-              <button 
-                key={tier.tier}
-                className={`pricing-tab ${activePlan === tier.tier ? 'active' : ''}`}
-                onClick={() => setActivePlan(tier.tier)}
-              >
-                {tier.tier}
-              </button>
-            ))}
-          </div>
-          <div className="pricing-grid">
-            {pricing.map((tier, index) => (
-              <div 
-                key={index} 
-                className={`pricing-card-wrapper ${activePlan === tier.tier ? 'active' : 'inactive'}`}
-                onClick={() => setActivePlan(tier.tier)}
-              >
-                <PricingCard 
-                  tier={tier.tier}
-                  price={tier.price}
-                  description={tier.description}
-                  features={tier.features}
-                  isPopular={tier.isPopular}
-                  isActive={activePlan === tier.tier}
-                />
+          {loading ? (
+             <div className="loading-state" style={{ textAlign: 'center', padding: '2rem' }}>Loading pricing...</div>
+          ) : pricing.length > 0 ? (
+            <>
+              <div className="pricing-selector-mobile">
+                {pricing.map((tier) => (
+                  <button 
+                    key={tier.tier}
+                    className={`pricing-tab ${activePlan === tier.tier ? 'active' : ''}`}
+                    onClick={() => setActivePlan(tier.tier)}
+                  >
+                    {tier.tier}
+                  </button>
+                ))}
               </div>
-            ))}
-          </div>
+              <div className="pricing-grid">
+                {pricing.map((tier, index) => (
+                  <div 
+                    key={index} 
+                    className={`pricing-card-wrapper ${activePlan === tier.tier ? 'active' : 'inactive'}`}
+                    onClick={() => setActivePlan(tier.tier)}
+                  >
+                    <PricingCard 
+                      tier={tier.tier}
+                      price={tier.price}
+                      description={tier.description}
+                      features={tier.features}
+                      isPopular={tier.isPopular}
+                      isActive={activePlan === tier.tier}
+                    />
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="empty-state" style={{ textAlign: 'center', padding: '2rem' }}>Pricing content coming soon.</div>
+          )}
         </div>
       </section>
 

@@ -1,11 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PricingCard from '../../components/PricingCard/PricingCard';
 import CTA from '../../components/CTA/CTA';
-import { pricing } from '../../data/pricing';
+import publicService from '../../services/publicService';
 import './Pricing.css';
 
 const Pricing = () => {
-  const [activePlan, setActivePlan] = useState(pricing.find(p => p.isPopular)?.tier || pricing[0].tier);
+  const [pricing, setPricing] = useState([]);
+  const [activePlan, setActivePlan] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchPricing = async () => {
+      try {
+        const data = await publicService.getPublicPricing();
+        if (data.success) {
+          setPricing(data.data);
+          if (data.data.length > 0) {
+            setActivePlan(data.data.find(p => p.isPopular)?.tier || data.data[0].tier);
+          }
+        }
+      } catch (err) {
+        setError('Failed to load pricing plans. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPricing();
+  }, []);
 
   return (
     <div className="pricing-page">
@@ -16,36 +38,46 @@ const Pricing = () => {
             <p>Professional solutions tailored to your scale and requirements. Final pricing depends on project scope, features, integrations and complexity.</p>
           </div>
 
-          <div className="pricing-selector-mobile">
-            {pricing.map((tier) => (
-              <button
-                key={tier.tier}
-                className={`pricing-tab ${activePlan === tier.tier ? 'active' : ''}`}
-                onClick={() => setActivePlan(tier.tier)}
-              >
-                {tier.tier}
-              </button>
-            ))}
-          </div>
-
-          <div className="pricing-grid">
-            {pricing.map((tier, index) => (
-              <div
-                key={index}
-                className={`pricing-card-wrapper ${activePlan === tier.tier ? 'active' : 'inactive'}`}
-                onClick={() => setActivePlan(tier.tier)}
-              >
-                <PricingCard
-                  tier={tier.tier}
-                  price={tier.price}
-                  description={tier.description}
-                  features={tier.features}
-                  isPopular={tier.isPopular}
-                  isActive={activePlan === tier.tier}
-                />
+          {loading ? (
+             <div className="loading-state" style={{ textAlign: 'center', padding: '3rem' }}>Loading pricing plans...</div>
+          ) : error ? (
+             <div className="error-state" style={{ textAlign: 'center', color: 'red', padding: '3rem' }}>{error}</div>
+          ) : pricing.length === 0 ? (
+             <div className="empty-state" style={{ textAlign: 'center', padding: '3rem' }}>No pricing plans available at the moment.</div>
+          ) : (
+            <>
+              <div className="pricing-selector-mobile">
+                {pricing.map((tier) => (
+                  <button
+                    key={tier.tier}
+                    className={`pricing-tab ${activePlan === tier.tier ? 'active' : ''}`}
+                    onClick={() => setActivePlan(tier.tier)}
+                  >
+                    {tier.tier}
+                  </button>
+                ))}
               </div>
-            ))}
-          </div>
+
+              <div className="pricing-grid">
+                {pricing.map((tier, index) => (
+                  <div
+                    key={index}
+                    className={`pricing-card-wrapper ${activePlan === tier.tier ? 'active' : 'inactive'}`}
+                    onClick={() => setActivePlan(tier.tier)}
+                  >
+                    <PricingCard
+                      tier={tier.tier}
+                      price={tier.price}
+                      description={tier.description}
+                      features={tier.features}
+                      isPopular={tier.isPopular}
+                      isActive={activePlan === tier.tier}
+                    />
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
 
           <div className="pricing-disclaimer">
             <p>
