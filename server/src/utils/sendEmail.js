@@ -2,13 +2,18 @@ import nodemailer from 'nodemailer';
 
 const sendEmail = async (options) => {
   // Create a transporter
+  const smtpPort = parseInt(process.env.SMTP_PORT, 10) || 587;
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT,
+    port: smtpPort,
+    secure: smtpPort === 465, // true for port 465 (SSL), false for 587 (STARTTLS)
     auth: {
       user: process.env.SMTP_EMAIL,
       pass: process.env.SMTP_PASSWORD,
     },
+    connectionTimeout: 10000, // 10 seconds — prevents indefinite hang
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
   });
 
   // Define email options

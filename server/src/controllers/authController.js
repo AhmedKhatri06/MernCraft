@@ -136,8 +136,9 @@ export const forgotPassword = async (req, res, next) => {
     await user.save({ validateBeforeSave: false });
 
     // Create reset url
-    // For Vite, default local dev port is 5173
-    const resetUrl = `${req.protocol}://${req.get('host').replace('5000', '5173')}/reset-password/${resetToken}`;
+    // Use the frontend CLIENT_URL so the reset link points to the Vercel app, not the Render backend
+    const clientUrl = process.env.CLIENT_URL || `${req.protocol}://${req.get('host')}`;
+    const resetUrl = `${clientUrl}/reset-password/${resetToken}`;
 
     const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please make a PUT request to: \n\n ${resetUrl}`;
     const htmlMessage = `
@@ -157,16 +158,12 @@ export const forgotPassword = async (req, res, next) => {
 
       res.status(200).json({ success: true, message: 'Email sent' });
     } catch (err) {
-      console.error(err);
+      console.error('Email sending failed:', err.message);
       user.resetPasswordToken = undefined;
       user.resetPasswordExpire = undefined;
       await user.save({ validateBeforeSave: false });
 
-      // If email isn't configured, for local dev, log it instead of completely failing the request if we want to debug
-      // return res.status(500).json({ success: false, message: 'Email could not be sent. Have you configured SMTP in .env?' });
-      // To ensure local testing works even without SMTP credentials, we will log the URL and send a success if nodemailer fails.
-      console.log(`[DEVELOPMENT] Reset URL: ${resetUrl}`);
-      res.status(200).json({ success: true, message: 'Email sent (simulated due to SMTP error, check server console for link)' });
+      return res.status(500).json({ success: false, message: 'Password reset email could not be sent. Please try again later.' });
     }
   } catch (error) {
     next(error);
