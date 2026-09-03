@@ -1,5 +1,7 @@
 import Lead from '../../models/Lead.js';
 
+const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 // @desc    Get all leads (with pagination & search)
 // @route   GET /api/admin/leads
 // @access  Private/Admin
@@ -15,10 +17,11 @@ export const getLeads = async (req, res, next) => {
       query.status = req.query.status;
     }
     if (req.query.search) {
+      const sanitizedSearch = escapeRegex(req.query.search);
       query.$or = [
-        { name: { $regex: req.query.search, $options: 'i' } },
-        { email: { $regex: req.query.search, $options: 'i' } },
-        { company: { $regex: req.query.search, $options: 'i' } }
+        { name: { $regex: sanitizedSearch, $options: 'i' } },
+        { email: { $regex: sanitizedSearch, $options: 'i' } },
+        { company: { $regex: sanitizedSearch, $options: 'i' } }
       ];
     }
 

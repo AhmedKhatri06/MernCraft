@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import projectService from '../../../services/projectService';
+import ConfirmModal from '../../../components/ConfirmModal/ConfirmModal';
 import '../AdminTableStyles.css';
 
 const AdminProjects = () => {
@@ -9,8 +10,9 @@ const AdminProjects = () => {
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
+  const [projectToDelete, setProjectToDelete] = useState(null);
   const [formData, setFormData] = useState({
-    title: '', slug: '', category: '', description: '', 
+    name: '', slug: '', category: '', description: '', 
     image: '', projectUrl: '', githubUrl: '', status: 'draft', featured: false
   });
 
@@ -32,15 +34,20 @@ const AdminProjects = () => {
     if (project) {
       setSelectedProject(project);
       setFormData({
-        title: project.title, slug: project.slug, category: project.category,
-        description: project.description, image: project.image,
-        projectUrl: project.projectUrl || '', githubUrl: project.githubUrl || '',
-        status: project.status, featured: project.featured
+        name: project.name || project.title || '',
+        slug: project.slug || '',
+        category: project.category || '',
+        description: project.description || '',
+        image: project.image || '',
+        projectUrl: project.projectUrl || project.link || '',
+        githubUrl: project.githubUrl || '',
+        status: project.status || 'published',
+        featured: project.featured || false
       });
     } else {
       setSelectedProject(null);
       setFormData({
-        title: '', slug: '', category: '', description: '', 
+        name: '', slug: '', category: '', description: '', 
         image: '', projectUrl: '', githubUrl: '', status: 'draft', featured: false
       });
     }
@@ -50,10 +57,15 @@ const AdminProjects = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const payload = {
+        ...formData,
+        name: formData.name,
+        link: formData.projectUrl || formData.link || ''
+      };
       if (selectedProject) {
-        await projectService.update(selectedProject._id, formData);
+        await projectService.update(selectedProject._id, payload);
       } else {
-        await projectService.create(formData);
+        await projectService.create(payload);
       }
       setIsModalOpen(false);
       fetchProjects();
@@ -62,13 +74,13 @@ const AdminProjects = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this project?')) {
-      try {
-        await projectService.delete(id);
-        fetchProjects();
-      } catch (err) { alert('Delete failed'); }
-    }
+  const executeDeleteProject = async () => {
+    if (!projectToDelete) return;
+    try {
+      await projectService.delete(projectToDelete);
+      setProjectToDelete(null);
+      fetchProjects();
+    } catch (err) { alert('Delete failed'); }
   };
 
   return (
@@ -86,7 +98,7 @@ const AdminProjects = () => {
         <table className="admin-table">
           <thead>
             <tr>
-              <th>Title</th>
+              <th>Name</th>
               <th>Category</th>
               <th>Status</th>
               <th>Featured</th>
@@ -103,20 +115,20 @@ const AdminProjects = () => {
               projects.map(project => (
                 <tr key={project._id}>
                   <td>
-                    <strong>{project.title}</strong>
-                    <br/><small style={{color:'var(--text-secondary)'}}>{project.slug}</small>
+                    <strong>{project.name || project.title}</strong>
+                    {project.slug && <><br/><small style={{color:'var(--text-secondary)'}}>{project.slug}</small></>}
                   </td>
                   <td>{project.category}</td>
                   <td>
-                    <span className={`status-badge status-${project.status}`}>
-                      {project.status}
+                    <span className={`status-badge status-${project.status || 'published'}`}>
+                      {project.status || 'published'}
                     </span>
                   </td>
                   <td>{project.featured ? '⭐ Yes' : 'No'}</td>
                   <td>{new Date(project.createdAt).toLocaleDateString()}</td>
                   <td className="actions-cell">
                     <button onClick={() => handleOpenModal(project)} className="action-btn edit-btn">Edit</button>
-                    <button onClick={() => handleDelete(project._id)} className="action-btn delete-btn">Delete</button>
+                    <button onClick={() => setProjectToDelete(project._id)} className="action-btn delete-btn">Delete</button>
                   </td>
                 </tr>
               ))
@@ -132,13 +144,13 @@ const AdminProjects = () => {
             <button className="close-modal" onClick={() => setIsModalOpen(false)}>X</button>
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '20px' }}>
               <div>
-                <label>Title*</label>
+                <label>Project Name*</label>
                 <input required type="text" className="admin-input" style={{width: '100%'}} 
-                  value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} />
+                  value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
               </div>
               <div>
-                <label>Slug* (e.g. e-commerce-platform)</label>
-                <input required type="text" className="admin-input" style={{width: '100%'}} 
+                <label>Slug (e.g. e-commerce-platform)</label>
+                <input type="text" className="admin-input" style={{width: '100%'}} 
                   value={formData.slug} onChange={e => setFormData({...formData, slug: e.target.value})} />
               </div>
               <div>
@@ -147,8 +159,8 @@ const AdminProjects = () => {
                   value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} />
               </div>
               <div>
-                <label>Image URL*</label>
-                <input required type="text" className="admin-input" style={{width: '100%'}} 
+                <label>Image URL</label>
+                <input type="text" className="admin-input" style={{width: '100%'}} 
                   value={formData.image} onChange={e => setFormData({...formData, image: e.target.value})} />
               </div>
               <div>
@@ -180,6 +192,15 @@ const AdminProjects = () => {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={!!projectToDelete}
+        title="Delete Project"
+        message="Are you sure you want to permanently delete this portfolio project?"
+        confirmText="Delete Project"
+        onConfirm={executeDeleteProject}
+        onCancel={() => setProjectToDelete(null)}
+      />
     </div>
   );
 };

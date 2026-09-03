@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import blogService from '../../../services/blogService';
+import { useAuth } from '../../../context/AuthContext';
 import '../AdminTableStyles.css';
 
 const AdminBlog = () => {
+  const { user } = useAuth();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -10,7 +12,7 @@ const AdminBlog = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [formData, setFormData] = useState({
-    title: '', slug: '', excerpt: '', content: '', coverImage: '', category: '', tags: '', author: 'Admin', status: 'draft'
+    title: '', slug: '', excerpt: '', content: '', coverImage: '', category: '', tags: '', status: 'draft'
   });
 
   const fetchItems = async () => {
@@ -31,14 +33,19 @@ const AdminBlog = () => {
     if (item) {
       setSelectedItem(item);
       setFormData({
-        title: item.title, slug: item.slug, excerpt: item.excerpt, content: item.content, 
-        coverImage: item.coverImage || '', category: item.category, tags: item.tags.join(', '), 
-        author: item.author, status: item.status
+        title: item.title, 
+        slug: item.slug, 
+        excerpt: item.excerpt, 
+        content: item.content, 
+        coverImage: item.coverImage || '', 
+        category: item.category, 
+        tags: Array.isArray(item.tags) ? item.tags.join(', ') : (item.tags || ''), 
+        status: item.status
       });
     } else {
       setSelectedItem(null);
       setFormData({
-        title: '', slug: '', excerpt: '', content: '', coverImage: '', category: '', tags: '', author: 'Admin', status: 'draft'
+        title: '', slug: '', excerpt: '', content: '', coverImage: '', category: '', tags: '', status: 'draft'
       });
     }
     setIsModalOpen(true);
@@ -47,9 +54,11 @@ const AdminBlog = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const authorId = user?.id || user?._id || (selectedItem?.author?._id || selectedItem?.author);
       const payload = {
         ...formData,
-        tags: formData.tags.split(',').map(t => t.trim()).filter(t => t)
+        author: authorId,
+        tags: typeof formData.tags === 'string' ? formData.tags.split(',').map(t => t.trim()).filter(t => t) : formData.tags
       };
 
       if (selectedItem) {
@@ -107,7 +116,7 @@ const AdminBlog = () => {
                     <br/><small style={{color:'var(--text-secondary)'}}>{item.slug}</small>
                   </td>
                   <td>{item.category}</td>
-                  <td>{item.author}</td>
+                  <td>{typeof item.author === 'object' && item.author !== null ? (item.author.name || item.author.email) : (item.author || 'Admin')}</td>
                   <td>
                     <span className={`status-badge status-${item.status}`}>
                       {item.status}

@@ -5,8 +5,26 @@ import Quote from '../../models/Quote.js';
 // @access  Private/Admin
 export const getQuotes = async (req, res, next) => {
   try {
-    const quotes = await Quote.find().sort({ createdAt: -1 });
-    res.status(200).json({ success: true, data: quotes });
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 25;
+    const startIndex = (page - 1) * limit;
+
+    const total = await Quote.countDocuments();
+    const quotes = await Quote.find()
+      .sort({ createdAt: -1 })
+      .skip(startIndex)
+      .limit(limit);
+
+    res.status(200).json({
+      success: true,
+      data: quotes,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     next(error);
   }
@@ -17,7 +35,40 @@ export const getQuotes = async (req, res, next) => {
 // @access  Private/Admin
 export const createQuote = async (req, res, next) => {
   try {
-    const quote = await Quote.create(req.body);
+    const {
+      leadId,
+      clientName,
+      clientEmail,
+      title,
+      projectType,
+      amount,
+      total,
+      subtotal,
+      discount,
+      details,
+      items,
+      notes,
+      status
+    } = req.body;
+
+    const finalTotal = total !== undefined ? total : (amount !== undefined ? amount : 0);
+
+    const quote = await Quote.create({
+      leadId,
+      clientName,
+      clientEmail,
+      title,
+      projectType,
+      amount: finalTotal,
+      total: finalTotal,
+      subtotal: subtotal || finalTotal,
+      discount: discount || 0,
+      details,
+      items: Array.isArray(items) ? items : [],
+      notes,
+      status: status || 'draft'
+    });
+
     res.status(201).json({ success: true, data: quote, message: 'Quote created successfully' });
   } catch (error) {
     next(error);
@@ -42,7 +93,23 @@ export const getQuote = async (req, res, next) => {
 // @access  Private/Admin
 export const updateQuote = async (req, res, next) => {
   try {
-    const quote = await Quote.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    const allowedFields = [
+      'clientName', 'clientEmail', 'title', 'projectType',
+      'amount', 'total', 'subtotal', 'discount',
+      'details', 'items', 'notes', 'status', 'leadId'
+    ];
+
+    const updateData = {};
+    for (const key of allowedFields) {
+      if (req.body[key] !== undefined) {
+        updateData[key] = req.body[key];
+      }
+    }
+    if (updateData.total !== undefined && updateData.amount === undefined) {
+      updateData.amount = updateData.total;
+    }
+
+    const quote = await Quote.findByIdAndUpdate(req.params.id, updateData, { new: true, runValidators: true });
     if (!quote) return res.status(404).json({ success: false, message: 'Quote not found' });
     res.status(200).json({ success: true, data: quote, message: 'Quote updated successfully' });
   } catch (error) {

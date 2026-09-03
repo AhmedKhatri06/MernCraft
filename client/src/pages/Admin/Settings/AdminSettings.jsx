@@ -74,7 +74,7 @@ const AdminSettings = () => {
       </div>
 
       {error && <div className="admin-error">{error}</div>}
-      {success && <div className="admin-error" style={{backgroundColor: '#dcfce7', color: '#15803d', borderColor: '#bbf7d0'}}>{success}</div>}
+      {success && <div className="admin-success">{success}</div>}
 
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         

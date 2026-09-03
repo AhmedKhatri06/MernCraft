@@ -95,9 +95,9 @@ const AdminDashboard = () => {
             <ul style={{ listStyle: 'none', padding: 0 }}>
               {recent.projects.map(project => (
                 <li key={project._id} style={{ padding: '10px 0', borderBottom: '1px solid var(--border-color)' }}>
-                  <strong>{project.title}</strong>
+                  <strong>{project.name || project.title}</strong>
                   <br/>
-                  <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{project.category} | Status: {project.status}</span>
+                  <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{project.category} | Status: {project.status || 'published'}</span>
                 </li>
               ))}
             </ul>

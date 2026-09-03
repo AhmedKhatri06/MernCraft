@@ -11,8 +11,8 @@ export const register = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
 
-    if (!name || !email || !password) {
-      return res.status(400).json({ success: false, message: 'Please provide all required fields' });
+    if (!name || !email || !password || typeof name !== 'string' || typeof email !== 'string' || typeof password !== 'string') {
+      return res.status(400).json({ success: false, message: 'Please provide valid name, email, and password' });
     }
 
     const userExists = await User.findOne({ email: email.toLowerCase() });
@@ -54,8 +54,8 @@ export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ success: false, message: 'Please provide email and password' });
+    if (!email || !password || typeof email !== 'string' || typeof password !== 'string') {
+      return res.status(400).json({ success: false, message: 'Please provide valid email and password' });
     }
 
     const user = await User.findOne({ email: email.toLowerCase() });
@@ -125,10 +125,17 @@ export const getMe = async (req, res) => {
 // @access  Public
 export const forgotPassword = async (req, res, next) => {
   try {
+    if (!req.body.email || typeof req.body.email !== 'string') {
+      return res.status(400).json({ success: false, message: 'Please provide a valid email address' });
+    }
+
     const user = await User.findOne({ email: req.body.email.toLowerCase() });
 
     if (!user) {
-      return res.status(404).json({ success: false, message: 'There is no user with that email' });
+      return res.status(200).json({
+        success: true,
+        message: 'If an account exists with this email, a password reset link has been sent.'
+      });
     }
 
     // Get reset token
@@ -156,7 +163,10 @@ export const forgotPassword = async (req, res, next) => {
         html: htmlMessage
       });
 
-      res.status(200).json({ success: true, message: 'Email sent' });
+      res.status(200).json({
+        success: true,
+        message: 'If an account exists with this email, a password reset link has been sent.'
+      });
     } catch (err) {
       console.error('Email sending failed:', err.message);
       user.resetPasswordToken = undefined;
@@ -190,8 +200,8 @@ export const resetPassword = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Invalid or expired token' });
     }
 
-    if (!req.body.password) {
-       return res.status(400).json({ success: false, message: 'Please provide a new password' });
+    if (!req.body.password || typeof req.body.password !== 'string') {
+       return res.status(400).json({ success: false, message: 'Please provide a valid new password' });
     }
 
     // Set new password

@@ -10,7 +10,7 @@ const AdminPricing = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [formData, setFormData] = useState({
-    name: '', slug: '', price: '', description: '', features: '', popular: false, order: 0, active: true
+    tier: '', slug: '', price: '', description: '', features: '', isPopular: false, order: 0, active: true
   });
 
   const fetchPlans = async () => {
@@ -31,14 +31,19 @@ const AdminPricing = () => {
     if (plan) {
       setSelectedPlan(plan);
       setFormData({
-        name: plan.name, slug: plan.slug, price: plan.price, description: plan.description,
-        features: plan.features.join('\n'), popular: plan.popular,
-        order: plan.order, active: plan.active
+        tier: plan.tier || plan.name || '',
+        slug: plan.slug || '',
+        price: plan.price || '',
+        description: plan.description || '',
+        features: Array.isArray(plan.features) ? plan.features.join('\n') : (plan.features || ''),
+        isPopular: plan.isPopular !== undefined ? plan.isPopular : (plan.popular || false),
+        order: plan.order || 0,
+        active: plan.active !== undefined ? plan.active : true
       });
     } else {
       setSelectedPlan(null);
       setFormData({
-        name: '', slug: '', price: '', description: '', features: '', popular: false, order: plans.length, active: true
+        tier: '', slug: '', price: '', description: '', features: '', isPopular: false, order: plans.length, active: true
       });
     }
     setIsModalOpen(true);
@@ -49,7 +54,11 @@ const AdminPricing = () => {
     try {
       const payload = {
         ...formData,
-        features: formData.features.split('\n').map(f => f.trim()).filter(f => f)
+        tier: formData.tier,
+        isPopular: formData.isPopular,
+        features: typeof formData.features === 'string' 
+          ? formData.features.split('\n').map(f => f.trim()).filter(f => f)
+          : formData.features
       };
       
       if (selectedPlan) {
@@ -89,7 +98,7 @@ const AdminPricing = () => {
           <thead>
             <tr>
               <th>Order</th>
-              <th>Plan Name</th>
+              <th>Tier</th>
               <th>Price</th>
               <th>Popular</th>
               <th>Status</th>
@@ -106,11 +115,11 @@ const AdminPricing = () => {
                 <tr key={plan._id}>
                   <td>{plan.order}</td>
                   <td>
-                    <strong>{plan.name}</strong>
-                    <br/><small style={{color:'var(--text-secondary)'}}>{plan.slug}</small>
+                    <strong>{plan.tier || plan.name}</strong>
+                    {plan.slug && <><br/><small style={{color:'var(--text-secondary)'}}>{plan.slug}</small></>}
                   </td>
-                  <td>${plan.price}</td>
-                  <td>{plan.popular ? '🔥 Yes' : 'No'}</td>
+                  <td>{plan.price}</td>
+                  <td>{plan.isPopular || plan.popular ? '🔥 Yes' : 'No'}</td>
                   <td>
                     <span className={`status-badge status-${plan.active ? 'active' : 'draft'}`}>
                       {plan.active ? 'Active' : 'Inactive'}
@@ -134,18 +143,18 @@ const AdminPricing = () => {
             <button className="close-modal" onClick={() => setIsModalOpen(false)}>X</button>
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '20px' }}>
               <div>
-                <label>Plan Name*</label>
+                <label>Tier Name* (e.g. Starter, Professional)</label>
                 <input required type="text" className="admin-input" style={{width: '100%'}} 
-                  value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                  value={formData.tier} onChange={e => setFormData({...formData, tier: e.target.value})} />
               </div>
               <div>
-                <label>Slug*</label>
-                <input required type="text" className="admin-input" style={{width: '100%'}} 
+                <label>Slug</label>
+                <input type="text" className="admin-input" style={{width: '100%'}} 
                   value={formData.slug} onChange={e => setFormData({...formData, slug: e.target.value})} />
               </div>
               <div>
-                <label>Price ($)*</label>
-                <input required type="number" className="admin-input" style={{width: '100%'}} 
+                <label>Price* (e.g. ₹14,999 or $199)</label>
+                <input required type="text" className="admin-input" style={{width: '100%'}} 
                   value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} />
               </div>
               <div>
@@ -171,7 +180,7 @@ const AdminPricing = () => {
                     Active (Publicly Visible)
                   </label>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                    <input type="checkbox" checked={formData.popular} onChange={e => setFormData({...formData, popular: e.target.checked})} />
+                    <input type="checkbox" checked={formData.isPopular} onChange={e => setFormData({...formData, isPopular: e.target.checked})} />
                     Mark as Popular
                   </label>
                 </div>

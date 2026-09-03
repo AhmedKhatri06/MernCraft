@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, Phone, MapPin, MessageCircle } from 'lucide-react';
 import logoImg from '../../assets/loog.jpeg';
 import './Footer.css';
 
@@ -21,6 +21,9 @@ const Footer = () => {
               </div>
               <div className="footer-contact-item">
                 <Phone size={16} /> <span><a href='tel:+917096106541'>+91 7096106541</a></span>
+              </div>
+              <div className="footer-contact-item">
+                <MessageCircle size={16} style={{ color: '#25D366' }} /> <span><a href='https://wa.me/917096106541?text=Hello%20MernCraft%2C%20I%20would%20like%20to%20inquire%20about%20a%20project.' target='_blank' rel='noopener noreferrer'>WhatsApp: +91 7096106541</a></span>
               </div>
               <div className="footer-contact-item">
                 <MapPin size={16} /> <span>Mumbai, Maharashtra, India</span>

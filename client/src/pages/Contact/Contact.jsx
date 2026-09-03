@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Phone, MapPin, Send } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, MessageCircle } from 'lucide-react';
 import './Contact.css';
 
 const Contact = () => {
@@ -79,6 +79,19 @@ const Contact = () => {
                   <div>
                     <h4>Call Us</h4>
                     <p><a href='tel:+917096106541'>+91 7096106541</a></p>
+                  </div>
+                </div>
+                <div className="info-item">
+                  <div className="info-icon" style={{ backgroundColor: '#25D366', color: '#ffffff' }}>
+                    <MessageCircle size={20} />
+                  </div>
+                  <div>
+                    <h4>WhatsApp Chat</h4>
+                    <p>
+                      <a href="https://wa.me/917096106541?text=Hello%20MernCraft%2C%20I%20would%20like%20to%20inquire%20about%20a%20project." target="_blank" rel="noopener noreferrer" style={{ color: '#25D366', fontWeight: 600 }}>
+                        Chat on WhatsApp &rarr;
+                      </a>
+                    </p>
                   </div>
                 </div>
                 <div className="info-item">
@@ -174,10 +187,15 @@ const Contact = () => {
               </div>
 
               <button type="submit" className="btn btn-primary submit-btn" disabled={loading}>
-                {loading ? 'Sending...' : (
+                {loading ? 'Submitting (connecting to cloud server)...' : (
                   <>Send Request <Send size={18} className="icon-right" /></>
                 )}
               </button>
+              {loading && (
+                <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '8px', textAlign: 'center' }}>
+                  Connecting to cloud backend. If waking from sleep, this may take a few moments.
+                </p>
+              )}
             </form>
           </div>
         </div>

@@ -16,7 +16,7 @@ const toggleStatus = async (id, active) => {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
-    body: JSON.stringify({ active }),
+    body: JSON.stringify({ active, isActive: active }),
   });
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || 'Failed to update user status');

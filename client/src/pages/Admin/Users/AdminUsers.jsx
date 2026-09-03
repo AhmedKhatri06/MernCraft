@@ -102,18 +102,18 @@ const AdminUsers = () => {
                   <td>{user.email}</td>
                   <td>{user.role}</td>
                   <td>
-                    <span className={`status-badge status-${user.active ? 'active' : 'archived'}`}>
-                      {user.active ? 'Active' : 'Inactive'}
+                    <span className={`status-badge status-${(user.isActive !== undefined ? user.isActive : user.active) ? 'active' : 'archived'}`}>
+                      {(user.isActive !== undefined ? user.isActive : user.active) ? 'Active' : 'Inactive'}
                     </span>
                   </td>
                   <td>{new Date(user.createdAt).toLocaleDateString()}</td>
                   <td className="actions-cell">
                     {user._id !== currentUser.id ? (
                       <button 
-                        onClick={() => handleToggleStatus(user._id, user.active)} 
-                        className={`action-btn ${user.active ? 'delete-btn' : 'edit-btn'}`}
+                        onClick={() => handleToggleStatus(user._id, user.isActive !== undefined ? user.isActive : user.active)} 
+                        className={`action-btn ${(user.isActive !== undefined ? user.isActive : user.active) ? 'delete-btn' : 'edit-btn'}`}
                       >
-                        {user.active ? 'Deactivate' : 'Activate'}
+                        {(user.isActive !== undefined ? user.isActive : user.active) ? 'Deactivate' : 'Activate'}
                       </button>
                     ) : (
                       <span style={{fontSize: '12px', color: 'var(--text-secondary)'}}>Current User</span>

@@ -1,11 +1,12 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 
 const userSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  role: { type: String, default: 'admin' },
+  name: { type: String, required: true, maxlength: 100 },
+  email: { type: String, required: true, unique: true, maxlength: 255 },
+  password: { type: String, required: true, maxlength: 255 },
+  role: { type: String, default: 'user', enum: ['user', 'admin'] },
   isActive: { type: Boolean, default: true },
   resetPasswordToken: String,
   resetPasswordExpire: Date
@@ -18,7 +19,6 @@ userSchema.pre('save', async function () {
 });
 
 // Generate and hash password token
-import crypto from 'crypto';
 
 userSchema.methods.getResetPasswordToken = function() {
   // Generate token

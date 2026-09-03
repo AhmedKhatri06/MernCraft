@@ -120,6 +120,15 @@
   border-radius: var(--radius-md);
 }
 
+.admin-success {
+  margin: 20px 40px;
+  background-color: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+  padding: 15px;
+  border-radius: var(--radius-md);
+}
+
 .admin-content {
   padding: 40px;
   flex: 1;

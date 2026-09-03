@@ -25,8 +25,8 @@ export const updateProfile = async (req, res, next) => {
       if (!isMatch) {
         return res.status(400).json({ success: false, message: 'Current password is incorrect' });
       }
-      const salt = await bcrypt.genSalt(10);
-      user.password = await bcrypt.hash(newPassword, salt);
+      // Rely on User model pre('save') hook to perform the single bcrypt hash
+      user.password = newPassword;
     }
 
     await user.save();

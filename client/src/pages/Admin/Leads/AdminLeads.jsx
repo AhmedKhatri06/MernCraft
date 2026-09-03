@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import leadService from '../../../services/leadService';
 import '../AdminTableStyles.css'; // Shared CSS for tables
 
+import ConfirmModal from '../../../components/ConfirmModal/ConfirmModal';
+
 const AdminLeads = () => {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,6 +16,7 @@ const AdminLeads = () => {
   const [statusFilter, setStatusFilter] = useState('');
 
   const [selectedLead, setSelectedLead] = useState(null);
+  const [leadToDelete, setLeadToDelete] = useState(null);
 
   const fetchLeads = async () => {
     setLoading(true);
@@ -49,14 +52,14 @@ const AdminLeads = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this lead?')) {
-      try {
-        await leadService.deleteLead(id);
-        fetchLeads();
-      } catch (err) {
-        alert('Failed to delete lead');
-      }
+  const executeDelete = async () => {
+    if (!leadToDelete) return;
+    try {
+      await leadService.deleteLead(leadToDelete);
+      setLeadToDelete(null);
+      fetchLeads();
+    } catch (err) {
+      alert('Failed to delete lead');
     }
   };
 
@@ -132,7 +135,7 @@ const AdminLeads = () => {
                   <td>{new Date(lead.createdAt).toLocaleDateString()}</td>
                   <td className="actions-cell">
                     <button onClick={() => setSelectedLead(lead)} className="action-btn view-btn">View</button>
-                    <button onClick={() => handleDelete(lead._id)} className="action-btn delete-btn">Delete</button>
+                    <button onClick={() => setLeadToDelete(lead._id)} className="action-btn delete-btn">Delete</button>
                   </td>
                 </tr>
               ))
@@ -172,6 +175,15 @@ const AdminLeads = () => {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={!!leadToDelete}
+        title="Delete Lead"
+        message="Are you sure you want to permanently delete this lead? All recorded inquiries and notes will be removed."
+        confirmText="Delete Lead"
+        onConfirm={executeDelete}
+        onCancel={() => setLeadToDelete(null)}
+      />
     </div>
   );
 };

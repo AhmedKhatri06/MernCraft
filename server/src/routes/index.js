@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import authRoutes from './authRoutes.js';
 import adminRoutes from './adminRoutes.js';
+import userRoutes from './userRoutes.js';
 import publicRoutes from './publicRoutes.js';
 import { submitContact } from '../controllers/contactController.js';
 
@@ -23,6 +24,9 @@ router.post('/contact', submitContact);
 
 // Auth Routes
 router.use('/auth', authRoutes);
+
+// User Routes
+router.use('/user', userRoutes);
 
 // Admin Routes
 router.use('/admin', adminRoutes);
