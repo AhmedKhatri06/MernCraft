@@ -12,6 +12,7 @@ const Home = () => {
   const [services, setServices] = useState([]);
   const [projects, setProjects] = useState([]);
   const [pricing, setPricing] = useState([]);
+  const [testimonials, setTestimonials] = useState([]);
   const [activePlan, setActivePlan] = useState('');
   
   const [loading, setLoading] = useState(true);
@@ -20,10 +21,11 @@ const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [servicesRes, projectsRes, pricingRes] = await Promise.all([
+        const [servicesRes, projectsRes, pricingRes, testimonialsRes] = await Promise.all([
           publicService.getPublicServices(),
           publicService.getPublicProjects(),
-          publicService.getPublicPricing()
+          publicService.getPublicPricing(),
+          publicService.getPublicTestimonials().catch(() => ({ success: false, data: [] }))
         ]);
 
         if (servicesRes.success) {
@@ -42,6 +44,7 @@ const Home = () => {
         if (projectsRes.success) {
           const formattedProjects = projectsRes.data.map(p => ({
             id: p._id,
+            name: p.name,
             title: p.name,
             category: p.category,
             description: p.description,
@@ -57,6 +60,10 @@ const Home = () => {
           if (pricingRes.data.length > 0) {
             setActivePlan(pricingRes.data.find(p => p.isPopular)?.tier || pricingRes.data[0].tier);
           }
+        }
+
+        if (testimonialsRes?.success && Array.isArray(testimonialsRes.data)) {
+          setTestimonials(testimonialsRes.data);
         }
       } catch (err) {
         console.error('Failed to fetch home page data', err);
@@ -320,6 +327,36 @@ const Home = () => {
           )}
         </div>
       </section>
+
+      {/* Testimonials Section */}
+      {testimonials.length > 0 && (
+        <section className="testimonials-section section-padding bg-tertiary">
+          <div className="container">
+            <div className="section-header">
+              <h2>What Our Clients Say</h2>
+              <p>Trusted by businesses to build and grow their online presence.</p>
+            </div>
+            <div className="testimonials-grid">
+              {testimonials.map((t) => (
+                <div key={t._id} className="testimonial-card">
+                  <div className="testimonial-rating">
+                    {"★".repeat(t.rating || 5)}
+                  </div>
+                  <p className="testimonial-content">"{t.content}"</p>
+                  <div className="testimonial-author">
+                    <h4 className="author-name">{t.name}</h4>
+                    {(t.role || t.company) && (
+                      <span className="author-role">
+                        {t.role}{t.role && t.company ? ' at ' : ''}{t.company}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <CTA />
     </div>

@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import authRoutes from './authRoutes.js';
 import adminRoutes from './adminRoutes.js';
+import publicRoutes from './publicRoutes.js';
 import { submitContact } from '../controllers/contactController.js';
 
 const router = express.Router();
@@ -26,8 +27,8 @@ router.use('/auth', authRoutes);
 // Admin Routes
 router.use('/admin', adminRoutes);
 
-// Public Routes
-import publicRoutes from './publicRoutes.js';
+// Public Routes (Accessible via both /api/services and /api/public/services)
+router.use('/', publicRoutes);
 router.use('/public', publicRoutes);
 
 export default router;

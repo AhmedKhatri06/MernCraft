@@ -7,7 +7,7 @@ const ProjectCard = ({ project, variant = 'default' }) => {
     <div className={`project-card ${variant}`}>
       <div className="project-image-wrapper">
         {project.image ? (
-          <img src={project.image} alt={project.name} className="project-image" />
+          <img src={project.image} alt={project.name || project.title || 'Project'} className="project-image" />
         ) : (
           <div className="project-placeholder-image">
             <LayoutTemplate size={48} className="placeholder-icon" />
@@ -18,10 +18,10 @@ const ProjectCard = ({ project, variant = 'default' }) => {
         <div className="project-meta">
           <span className="project-category">{project.category}</span>
         </div>
-        <h3 className="project-name">{project.name}</h3>
+        <h3 className="project-name">{project.name || project.title}</h3>
         <p className="project-desc">{project.description}</p>
         <div className="project-tech">
-          {project.technologies.map((tech, index) => (
+          {Array.isArray(project.technologies) && project.technologies.map((tech, index) => (
             <span key={index} className="tech-badge">{tech}</span>
           ))}
         </div>

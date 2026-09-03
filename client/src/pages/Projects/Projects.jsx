@@ -15,6 +15,7 @@ const Projects = () => {
         if (data.success) {
           const formattedProjects = data.data.map(p => ({
             id: p._id,
+            name: p.name,
             title: p.name,
             category: p.category,
             description: p.description,
